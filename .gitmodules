@@ -1,0 +1,7 @@
+[submodule "stable-diffusion"]
+	path = stable-diffusion
+	url = https://github.com/SirMorland/stable-diffusion.git
+	branch = main
+[submodule "GFPGAN"]
+	path = GFPGAN
+	url = https://github.com/SirMorland/GFPGAN.git

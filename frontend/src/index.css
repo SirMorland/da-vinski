@@ -1,0 +1,137 @@
+* {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+	line-height: 1;
+	font-family: 'Nunito', sans-serif;
+}
+
+html {
+	background-color: hsl(0deg, 0%, 10%);
+	height: 100%;
+}
+
+body, #root {
+	height: 100%;
+}
+
+main {
+	display: grid;
+	grid-template-rows: max-content 1fr;
+	height: 100%;
+	max-width: 768px;
+	margin: auto;
+	align-items: center;
+}
+
+h1 {
+	margin: 32px 16px;
+	font-family: 'Finger Paint', cursive;
+	color: hsl(35deg, 70%, 70%);
+	text-align: center;
+}
+h2 {
+	margin: 32px 16px;
+	font-family: 'Finger Paint', cursive;
+	color: hsl(0deg, 0%, 90%);
+	text-align: center;
+	font-variant-numeric: tabular-nums;
+}
+h3 {
+	margin: 32px 16px;
+	color: hsl(0deg, 0%, 80%);
+	text-align: center;
+}
+
+form {
+	display: grid;
+	padding: 16px;
+	gap: 16px;
+}
+textarea {
+	appearance: none;
+	border: none;
+	outline: none;
+
+	width: 100%;
+	aspect-ratio: 2;
+	font-size: 24px;
+	padding: 24px;
+	border-radius: 32px;
+
+	color: hsl(0deg, 0%, 90%);
+	background-color: hsl(0deg, 0%, 20%);
+
+	resize: none;
+}
+button, a.button, select {
+	appearance: none;
+	border: none;
+	outline: none;
+	text-decoration: none;
+
+	font-family: 'Finger Paint', cursive;
+	font-size: 16px;
+	padding: 8px;
+	border-radius: 16px;
+
+	color: hsl(0deg, 0%, 10%);
+	background-color: hsl(35deg, 70%, 70%);
+	text-align: center;
+}
+select {
+	appearance: auto;
+	height: 32px;
+	padding: 0;
+}
+button:disabled {
+	color: hsl(0deg, 0%, 50%);
+	background-color: hsl(0deg, 0%, 70%);
+}
+
+.image-grid {
+	margin: 16px;
+	display: grid;
+	grid-template-columns: repeat(3, auto);
+	justify-content: center;
+	gap: 16px;
+}
+.image-grid img {
+	width: 100%;
+	border-radius: 24px;
+}
+
+.image-view * {
+	position: relative;
+	z-index: 1;
+}
+
+.image-view > img {
+	width: 100%;
+}
+.image-view .info {
+	display: grid;
+	gap: 16px;
+	margin: 16px;
+}
+.image-view p {
+	color: hsl(0deg, 0%, 80%);
+	text-align: center;
+}
+.image-view p span {
+	color: hsl(35deg, 70%, 70%);
+}
+.buttons {
+	display: grid;
+	gap: 16px;
+	grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
+}
+.image-view .strip {
+	display: grid;
+	gap: 16px;
+	grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+}
+.image-view .strip img {
+	width: 100%;
+	border-radius: 12px;
+}

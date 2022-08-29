@@ -1,0 +1,6 @@
+{
+	"python.analysis.extraPaths": [
+		"./stable-diffusion",
+		"./GFPGAN"
+	]
+}
