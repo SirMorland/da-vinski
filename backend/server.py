@@ -1,20 +1,28 @@
+import os
 from aiohttp import web
 import socketio
 from optimizedSD.optimized_txt2img import generateImages
 from inference_gfpgan import fix_faces
 
+path = "../stable-diffusion/models/ldm/stable-diffusion-v1/"
+models = os.listdir(path)
+paths = {}
+for model in models:
+	paths[model] = f"../stable-diffusion/models/ldm/stable-diffusion-v1/{model}"
+
 sio = socketio.AsyncServer(
 	async_mode='aiohttp',
 	async_handlers=True,
 	cors_allowed_origins='*',
-	ping_timeout=300)
+	ping_timeout=300,
+	max_http_buffer_size=8000000)
 app = web.Application()
 sio.attach(app)
 
 @sio.event
 async def connect(sid, environ, auth):
 	print('connect ', sid)
-	await sio.emit("connected", room=sid)
+	await sio.emit("connected", data=models, room=sid)
 
 @sio.event
 def disconnect(sid):
@@ -25,6 +33,12 @@ def disconnect(sid):
 async def generate(sid, data):
 	await sio.emit("started", room=sid)
 	await sio.sleep(0)
+
+	if "model" in data:
+		modelPath = paths[data["model"]]
+		if modelPath:
+			data["ckpt"] = modelPath
+
 	images = await generateImages(data, sio, sid)
 
 	await sio.emit(
@@ -43,7 +57,8 @@ async def fixFaces(sid, data):
 		data=[{
 			"seed": data["seed"],
 			"steps": data["steps"],
-			"data": image
+			"data": image,
+			"fixed": True
 		}],
 		room=sid)
 

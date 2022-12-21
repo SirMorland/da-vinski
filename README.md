@@ -16,7 +16,7 @@ source venv/bin/activate
 #### 2. Install dependencies
 
 ```bash
-pip install torch --extra-index-url https://download.pytorch.org/whl/cu116
+pip install torch --extra-index-url https://download.pytorch.org/whl/cu117
 pip install -r backend/requirements.txt
 ```
 

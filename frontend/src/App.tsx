@@ -8,6 +8,7 @@ interface Data {
 	seed: number,
 	steps: number,
 	url: string,
+	fixed?: boolean,
 };
 
 const ENHANCE_STEPS: {[key: number]: number} = {
@@ -22,8 +23,11 @@ const ENHANCE_STEPS: {[key: number]: number} = {
 
 function App() {
 	const [prompt, setPrompt] = useState("");
+	const [initialSteps, setInitialSteps] = useState<number>();
 	const [width, setWidth] = useState<number>();
 	const [height, setHeight] = useState<number>();
+	const [model, setModel] = useState<string>();
+	const [models, setModels] = useState<string[]>();
 	const [seeds, setSeeds] = useState<number[]>([]);
 	const [data, setData] = useState<{[key: string]: Data[]}>({});
 	const [loading, setLoading] = useState({loading: false, current: 0, total: 0, message: ""});
@@ -50,8 +54,9 @@ function App() {
 			});
 		});
 		
-		socket.on("connected", () => {
+		socket.on("connected", (models: string[]) => {
 			console.log("connected");
+			setModels(models);
 		});
 
 		socket.on("started", () => {
@@ -70,7 +75,7 @@ function App() {
 				message: "Sampling"
 			});
 		});
-		socket.on("generated", async (data: {seed: number, steps: number, data: ArrayBuffer}[]) => {
+		socket.on("generated", async (data: {seed: number, steps: number, data: ArrayBuffer, fixed?: boolean}[]) => {
 			const seedList: number[] = [];
 			const urls: {[key: string]: Data} = {};
 			await Promise.all(
@@ -82,7 +87,7 @@ function App() {
 						fr.onload = () => {
 							console.log(fr.result);
 							seedList.push(a.seed);
-							const d = {seed: a.seed, steps: a.steps, url: fr.result as string};
+							const d = {seed: a.seed, steps: a.steps, url: fr.result as string, fixed: a.fixed};
 							urls[a.seed] = d;
 							select(old => {
 								if (old?.seed === d.seed) {
@@ -147,9 +152,10 @@ function App() {
 		event.preventDefault();
 		socket.emit("generate", {
 			prompt,
-			steps: 20,
+			steps: initialSteps ?? 20,
 			width,
 			height,
+			model,
 			samples: 9,
 		});
 	}
@@ -162,6 +168,12 @@ function App() {
 	}
 	const inputHeight = (event: any) => {
 		setHeight(parseInt(event.target.value));
+	}
+	const inputSteps = (event: any) => {
+		setInitialSteps(parseInt(event.target.value));
+	}
+	const inputModel = (event: any) => {
+		setModel(event.target.value);
 	}
 
 	const selectImage = (image?: Data) => {
@@ -178,6 +190,7 @@ function App() {
 				steps: ENHANCE_STEPS[selected?.steps || 20],
 				width,
 				height,
+				model,
 				samples: 1,
 				seed: selected?.seed
 			});
@@ -195,7 +208,7 @@ function App() {
 	}
 
 	const options = [];
-	for (let i = 256; i <= 1024; i += 64) {
+	for (let i = 256; i <= 2048; i += 64) {
 		options.push(i);
 	}
 
@@ -225,7 +238,10 @@ function App() {
 								{data[selected.seed].length > 1 &&
 									<div className="strip">
 										{data[selected.seed].map((d, i) =>
-											<img key={i} src={d.url} onClick={() => selectImage(d)} alt={prompt} />
+											<div key={i}>
+												<img src={d.url} onClick={() => selectImage(d)} alt={prompt} />
+												<p>Steps {d.steps}{d.fixed && " (fixed faces)"}</p>
+											</div>
 										)}
 									</div>
 								}
@@ -247,13 +263,25 @@ function App() {
 							<select value={width} defaultValue="Width" onChange={inputWidth}>
 								<option disabled>Width</option>
 								{options.map(option =>
-									<option key={option}>{option}</option>
+									<option key={option} style={option % 3 == 0 ? {backgroundColor: "hsl(35deg, 70%, 80%)"} : undefined}>{option}</option>
 								)}
 							</select>
 							<select value={height} defaultValue="Height" onChange={inputHeight}>
 								<option disabled>Height</option>
 								{options.map(option =>
-									<option key={option}>{option}</option>
+									<option key={option} style={option % 3 == 0 ? {backgroundColor: "hsl(35deg, 70%, 80%)"} : undefined}>{option}</option>
+								)}
+							</select>
+							<select value={initialSteps} defaultValue="Steps" onChange={inputSteps}>
+								<option disabled>Steps</option>
+								{[5, 10, 20, 50, 100].map(m =>
+									<option key={m}>{m}</option>
+								)}
+							</select>
+							<select value={model} defaultValue="Model" onChange={inputModel}>
+								<option disabled>Model</option>
+								{models?.map(m =>
+									<option key={m}>{m}</option>
 								)}
 							</select>
 							<button type="submit">GENERATE</button>
